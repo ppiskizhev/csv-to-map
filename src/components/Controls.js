@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
@@ -44,7 +45,12 @@ class Controls extends Component {
   }
 
   handleAdd = () => {
-    
+    const files = this.input.current.files;
+    this.props.onAddFiles(files);
+    this.input.current.value = '';
+    this.setState({
+      amount: 0
+    });
   }
   
   render() {
@@ -80,12 +86,18 @@ class Controls extends Component {
           variant="contained" 
           className={classes.buttonBot} 
           disabled={this.state.amount > 0 ? false : true}
-          size='small'>
+          size='small'
+          onClick={this.handleAdd}>
             Добавить
         </Button>
       </div>
     );
   }
 };
+
+Controls.propTypes = {
+  classes: PropTypes.object.isRequired,
+  onAddFiles: PropTypes.func.isRequired
+}
 
 export default withStyles(styles)(Controls);
