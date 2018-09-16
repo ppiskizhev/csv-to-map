@@ -1,5 +1,5 @@
 import React from 'react';
-import { YMaps, Map, Placemark, GeoObject } from 'react-yandex-maps';
+import { YMaps, Map, ObjectManager } from 'react-yandex-maps';
 import styled from 'styled-components';
 
 const MapContainer = styled.div`
@@ -9,32 +9,24 @@ const MapContainer = styled.div`
 
 const mapState = { center: [44.23276, 41.56953], zoom: 9, controls: [] };
  
-const MyPlacemark = ({ files }) => {
+const MyMap = ({ files }) => {
 
-  let placemarks = [];
+  let features = [];
 
-  Object.keys(files).forEach((name, index) => {
-    const newPlacemarks = files[name].isActive 
-    ? files[name].coords.map(coordsCouple => {
-        console.log(coordsCouple);
-        return (
-          <Placemark 
-            geometry={{
-              coordinates: coordsCouple
-            }}
-            options={{
-              preset: 'islands#icon',
-              iconColor: files[name].color
-            }}
-          />
-        )
-      }
-    )
-    :
-    [];
+  Object.keys(files).forEach(name => {
+    const currentFile = files[name];
+    if (currentFile.isActive) {
+      currentFile.coords.forEach(coordsCouple => {
+        features.push({
+          type: "Feature",
+          geometry: {type: "Point", "coordinates": coordsCouple},
+          options: {preset: "islands#icon", "iconColor": currentFile.color}
+        });
+      });
+    }
+  });
 
-    placemarks = placemarks.concat(newPlacemarks);
-  })
+  features.forEach((item, index) => item.id = index);
 
   return (
     <MapContainer>
@@ -45,7 +37,16 @@ const MyPlacemark = ({ files }) => {
           height='100%'
         >
 
-        {placemarks}
+        <ObjectManager
+          options={{
+            clusterize: true,
+            gridSize: 64,
+          }}
+          clusters={{
+            clusterIconLayout: 'default#pieChart'
+          }}
+          features={features}
+        />
 
         </Map>
       </YMaps>
@@ -53,5 +54,5 @@ const MyPlacemark = ({ files }) => {
   );
 };
 
-export default MyPlacemark;
+export default MyMap;
 

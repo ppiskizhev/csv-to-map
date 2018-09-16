@@ -9,40 +9,58 @@ const AppFrame = styled.div`
   height: 100%;
 `;
 
-const palette = ['#f48c42', '#1edb63'];
-
 class App extends Component {
   state = { 
     files: {}
   }
 
-  handleAddFiles = data => {
-    const updateState = (file, name, index) => {
-      const coords = file.data.filter(item => Number(item[0])).map(item => [Number(item[1]), Number(item[0])]);
+  componentDidMount = () => {
+    this.getFromLocalStorage('files');
+  }
 
-      const newFile = {
-        coords,
-        isActive: false,
-        color: palette[index]
-      };
-
-      const updatedFiles = {
-        ...this.state.files, 
-        [name]: newFile
-      };
-
-      this.setState({
-        files: updatedFiles
-      });
+  getRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
     }
+    return color;
+  }
 
-    Object.keys(data).forEach((number, index) => {
-      const name = data[number].name;
-      Papa.parse(data[number], {
-        complete: result => {
-          updateState(result, name, index);
-        }
-      });
+  updateState = (file, name) => {
+    const color = this.getRandomColor();
+    const coords =  file.data.filter(item => Number(item[0])).map(item => [Number(item[1]), Number(item[0])]);
+
+    const newFile = {
+      coords,
+      color,
+      isActive: false,
+    };
+
+    const updatedFiles = {
+      ...this.state.files, 
+      [name]: newFile
+    };
+
+    this.setState({
+      files: updatedFiles
+    });
+
+    localStorage.setItem("files", JSON.stringify(updatedFiles));
+  }
+
+  parseData = data => {
+    Object.keys(data).forEach(number => {
+      const name = data[number].name.replace('.csv', '');
+
+      if (!this.state.files.hasOwnProperty(name)) {
+        Papa.parse(data[number], {
+          complete: result => {
+            this.updateState(result, name);
+          }
+        });
+      }
+
     });
   }
 
@@ -50,12 +68,26 @@ class App extends Component {
     const files = {...this.state.files};
     files[name].isActive = !files[name].isActive;
     this.setState({ files });
+    localStorage.setItem("files", JSON.stringify(files));
   }
 
   handleDelete = name => {
     const files = {...this.state.files};
     delete files[name];
     this.setState({ files });
+    localStorage.setItem("files", JSON.stringify(files));    
+  }
+
+  
+  getFromLocalStorage = key => {
+    let value = localStorage.getItem(key);
+
+    try {
+      value = JSON.parse(value);
+      this.setState({ [key]: value });
+    } catch (e) {
+      this.setState({ [key]: value });
+    }
   }
 
   render() {
@@ -63,7 +95,7 @@ class App extends Component {
       <AppFrame>
         <SideBar 
           files={this.state.files}
-          onAddFiles={this.handleAddFiles}
+          handleAddFiles={this.parseData}
           handleDelete={this.handleDelete}
           handleToggle={this.handleToggle}            
         />
