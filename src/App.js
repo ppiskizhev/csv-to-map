@@ -14,9 +14,9 @@ class App extends Component {
     files: {},
   };
 
-  componentDidMount = () => {
-    this.getFromLocalStorage('files');
-  };
+  // componentDidMount = () => {
+  //   this.getFromLocalStorage('files');
+  // };
 
   getRandomColor = () => {
     const letters = '0123456789ABCDEF';
