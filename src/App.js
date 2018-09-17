@@ -80,7 +80,7 @@ class App extends Component {
   };
 
   getFromLocalStorage = key => {
-    let value = localStorage.getItem(key);
+    let value = localStorage.getItem(key) || {};
     console.log(value);
     try {
       value = JSON.parse(value);
