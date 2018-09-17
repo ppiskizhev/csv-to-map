@@ -14,9 +14,9 @@ class App extends Component {
     files: {},
   };
 
-  // componentDidMount = () => {
-  //   this.getFromLocalStorage('files');
-  // };
+  componentDidMount = () => {
+    this.getFromLocalStorage('files');
+  };
 
   getRandomColor = () => {
     const letters = '0123456789ABCDEF';
@@ -80,13 +80,13 @@ class App extends Component {
   };
 
   getFromLocalStorage = key => {
-    let value = localStorage.getItem(key) || {};
+    let value = localStorage.getItem(key);
 
     try {
       value = JSON.parse(value);
       this.setState({ [key]: value });
     } catch (e) {
-      this.setState({ [key]: value });
+      this.setState({ [key]: {} });
     }
   };
 
