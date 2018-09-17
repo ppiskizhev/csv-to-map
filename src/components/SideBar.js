@@ -11,20 +11,26 @@ const styles = {
     position: 'static',
     width: '300px',
     height: '100%',
-  }
+  },
 };
 
-const SideBar = ({ classes, files, handleAddFiles, handleToggle, handleDelete }) => (
+const SideBar = ({
+  classes,
+  files,
+  handleAddFiles,
+  handleToggle,
+  handleDelete,
+}) => (
   <Drawer
-    variant='permanent'
+    variant="permanent"
     classes={{
       paper: classes.drawer,
     }}
   >
     <Controls onAddFiles={handleAddFiles} />
     <Divider />
-    <FileList 
-      files={files} 
+    <FileList
+      files={files}
       handleToggle={handleToggle}
       handleDelete={handleDelete}
     />
@@ -36,7 +42,7 @@ SideBar.propTypes = {
   files: PropTypes.object.isRequired,
   handleAddFiles: PropTypes.func.isRequired,
   handleToggle: PropTypes.func.isRequired,
-  handleDelete: PropTypes.func.isRequired,  
-}
+  handleDelete: PropTypes.func.isRequired,
+};
 
 export default withStyles(styles)(SideBar);

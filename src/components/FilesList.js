@@ -16,13 +16,13 @@ const styles = {
       color: 'var(--colorR)',
     },
   },
-  checked: {}
+  checked: {},
 };
 
 const FileList = ({ files, classes, handleToggle, handleDelete }) => (
   <List>
     {Object.keys(files).map(name => (
-      <ListItem 
+      <ListItem
         key={name}
         button
         disableRipple
@@ -30,12 +30,12 @@ const FileList = ({ files, classes, handleToggle, handleDelete }) => (
         style={{ '--colorR': files[name].color }}
         onClick={() => handleToggle(name)}
       >
-        <Checkbox 
+        <Checkbox
           disableRipple
-          color='default'
+          color="default"
           classes={{
             root: classes.root,
-            checked: classes.checked
+            checked: classes.checked,
           }}
           checked={files[name].isActive}
         />
@@ -53,7 +53,7 @@ const FileList = ({ files, classes, handleToggle, handleDelete }) => (
 FileList.propTypes = {
   files: PropTypes.object.isRequired,
   handleToggle: PropTypes.func.isRequired,
-  handleDelete: PropTypes.func.isRequired
-}
+  handleDelete: PropTypes.func.isRequired,
+};
 
 export default withStyles(styles)(FileList);

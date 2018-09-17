@@ -10,15 +10,15 @@ const styles = theme => ({
   },
   buttonBot: {
     margin: 10,
-    marginTop: 0
+    marginTop: 0,
   },
   container: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   input: {
-    display: 'none'
-  }
+    display: 'none',
+  },
 });
 
 class Controls extends Component {
@@ -26,7 +26,7 @@ class Controls extends Component {
     super(props);
 
     this.state = {
-      amount: 0
+      amount: 0,
     };
 
     this.input = React.createRef();
@@ -34,70 +34,71 @@ class Controls extends Component {
 
   invokeInput = () => {
     this.input.current.click();
-  }
+  };
 
-  handleSelect = (e) => {
+  handleSelect = e => {
     const amount = e.target.files.length;
 
     this.setState({
-      amount
-    })
-  }
+      amount,
+    });
+  };
 
   handleAdd = () => {
     const files = this.input.current.files;
     this.props.onAddFiles(files);
     this.input.current.value = '';
     this.setState({
-      amount: 0
+      amount: 0,
     });
-  }
-  
+  };
+
   render() {
     const { classes } = this.props;
 
     return (
       <div>
         <input
-            accept=".csv"
-            className={classes.input}
-            id="file-input"
-            multiple
-            type="file"
-            ref={this.input}
-            onChange={this.handleSelect}
+          accept=".csv"
+          className={classes.input}
+          id="file-input"
+          multiple
+          type="file"
+          ref={this.input}
+          onChange={this.handleSelect}
         />
         <div className={classes.container}>
-          <Button 
-            variant="contained" 
-            className={classes.buttonTop} 
-            size='small'
-            onClick={this.invokeInput}>
-              Выбрать файлы
+          <Button
+            variant="contained"
+            className={classes.buttonTop}
+            size="small"
+            onClick={this.invokeInput}
+          >
+            Выбрать файлы
           </Button>
           <Typography>
-            {this.state.amount > 0 
+            {this.state.amount > 0
               ? `Число файлов: ${this.state.amount}`
-              : `Файл не выбран`
-            }
+              : `Файл не выбран`}
           </Typography>
         </div>
-        <Button 
-          variant="contained" 
-          className={classes.buttonBot} 
+        <Button
+          variant="contained"
+          className={classes.buttonBot}
           disabled={this.state.amount > 0 ? false : true}
-          size='small'
-          onClick={this.handleAdd}>
-            Добавить
+          size="small"
+          onClick={this.handleAdd}
+        >
+          Добавить
         </Button>
       </div>
     );
   }
-};
+}
 
 Controls.propTypes = {
   classes: PropTypes.object.isRequired,
-  onAddFiles: PropTypes.func.isRequired
-}
+  onAddFiles: PropTypes.func.isRequired,
+};
 
 export default withStyles(styles)(Controls);
