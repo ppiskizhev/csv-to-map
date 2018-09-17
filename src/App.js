@@ -81,7 +81,7 @@ class App extends Component {
 
   getFromLocalStorage = key => {
     let value = localStorage.getItem(key);
-
+    console.log(value);
     try {
       value = JSON.parse(value);
       this.setState({ [key]: value });
