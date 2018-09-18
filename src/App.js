@@ -29,12 +29,19 @@ class App extends Component {
 
   updateState = (file, name) => {
     const color = this.getRandomColor();
-    const coords = file.data
-      .filter(item => Number(item[0]))
-      .map(item => [Number(item[1]), Number(item[0])]);
+    const geoData = file.data.filter(item => Number(item[0])).map(item => ({
+      coords: [parseFloat(item[1]), parseFloat(item[0])],
+      partner: item[2],
+      address: item[4],
+      weight: Math.round(parseFloat(item[5]) * 10) / 10,
+      sum: Math.round(parseFloat(item[7].replace(/\s/g, '')) * 10) / 10,
+      task: item[8],
+    }));
+
+    console.log('data', geoData);
 
     const newFile = {
-      coords,
+      geoData,
       color,
       isActive: false,
     };
@@ -81,7 +88,6 @@ class App extends Component {
 
   getFromLocalStorage = key => {
     let value = localStorage.getItem(key) || {};
-    console.log(value);
     try {
       value = JSON.parse(value);
       this.setState({ [key]: value });

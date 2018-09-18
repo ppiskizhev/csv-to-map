@@ -7,21 +7,60 @@ const MapContainer = styled.div`
   overflow: hidden;
 `;
 
-const mapState = { center: [44.23276, 41.56953], zoom: 9, controls: [] };
+const mapState = {
+  center: [44.23276, 41.56953],
+  zoom: 9,
+  controls: [],
+};
 
 const MyMap = ({ files }) => {
   let features = [];
 
   Object.keys(files).forEach(name => {
     const currentFile = files[name];
+
     if (currentFile.isActive) {
-      currentFile.coords.forEach(coordsCouple => {
-        features.push({
-          type: 'Feature',
-          geometry: { type: 'Point', coordinates: coordsCouple },
-          options: { preset: 'islands#icon', iconColor: currentFile.color },
+      currentFile.geoData
+        .reduce((filtered, item) => {
+          for (let i = 0; i < filtered.length; i++) {
+            if (filtered[i].partner === item.partner) {
+              filtered[i].sum =
+                Math.round((filtered[i].sum + item.sum) * 10) / 10;
+              filtered[i].weight =
+                Math.round((filtered[i].weight + item.weight) * 10) / 10;
+              filtered[i].task += `, ${item.task}`;
+              return filtered;
+            }
+          }
+
+          filtered.push(item);
+          console.log('filtered', filtered);
+          return filtered;
+        }, [])
+        .forEach(data => {
+          features.push({
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: data.coords },
+            options: {
+              preset: 'islands#redIcon',
+              iconColor: currentFile.color,
+            },
+            properties: {
+              balloonContent: [
+                `Адрес: ${data.address}`,
+                '<br />',
+                `Сумма: ${data.sum}`,
+                '<br />',
+                `Вес: ${data.weight}`,
+                '<br />',
+                `Задания: ${data.task}`,
+              ].join(''),
+              clusterCaption: `${data.partner}`,
+              hintContent: `${data.partner}`,
+              myDescription: 'Произвольное описание',
+            },
+          });
         });
-      });
     }
   });
 
