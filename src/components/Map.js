@@ -8,8 +8,8 @@ const MapContainer = styled.div`
 `;
 
 const mapState = {
-  center: [44.23276, 41.56953],
-  zoom: 9,
+  center: [45.03547, 38.975313],
+  zoom: 8,
   controls: [],
 };
 
@@ -34,7 +34,6 @@ const MyMap = ({ files }) => {
           }
 
           filtered.push(item);
-          console.log('filtered', filtered);
           return filtered;
         }, [])
         .forEach(data => {
@@ -47,6 +46,8 @@ const MyMap = ({ files }) => {
             },
             properties: {
               balloonContent: [
+                `<b>Контрагент: ${data.partner}</b>`,
+                '<br />',
                 `Адрес: ${data.address}`,
                 '<br />',
                 `Сумма: ${data.sum}`,

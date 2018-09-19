@@ -1,17 +1,33 @@
 import React, { Component } from 'react';
 import Papa from 'papaparse';
-import styled from 'styled-components';
+import { withStyles } from '@material-ui/core/styles';
 import SideBar from './components/SideBar';
 import Map from './components/Map';
+import MenuIcon from '@material-ui/icons/Menu';
+import IconButton from '@material-ui/core/IconButton';
 
-const AppFrame = styled.div`
-  display: flex;
-  height: 100%;
-`;
+const styles = theme => ({
+  appFrame: {
+    display: 'flex',
+    height: '100%',
+  },
+  navIcon: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 2600,
+    color: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+    [theme.breakpoints.up('md')]: {
+      display: 'none',
+    },
+  },
+});
 
 class App extends Component {
   state = {
     files: {},
+    isDrawerOpen: false,
   };
 
   componentDidMount = () => {
@@ -37,8 +53,6 @@ class App extends Component {
       sum: Math.round(parseFloat(item[7].replace(/\s/g, '')) * 10) / 10,
       task: item[8],
     }));
-
-    console.log('data', geoData);
 
     const newFile = {
       geoData,
@@ -72,14 +86,14 @@ class App extends Component {
     });
   };
 
-  handleToggle = name => {
+  handleFileToggle = name => {
     const files = { ...this.state.files };
     files[name].isActive = !files[name].isActive;
     this.setState({ files });
     localStorage.setItem('files', JSON.stringify(files));
   };
 
-  handleDelete = name => {
+  handleFileDelete = name => {
     const files = { ...this.state.files };
     delete files[name];
     this.setState({ files });
@@ -96,19 +110,35 @@ class App extends Component {
     }
   };
 
+  handleDrawerToggle = () => {
+    this.setState(state => ({ isDrawerOpen: !state.isDrawerOpen }));
+  };
+
   render() {
+    const { classes } = this.props;
+
     return (
-      <AppFrame>
+      <div className={classes.appFrame}>
+        <IconButton
+          color="inherit"
+          aria-label="Open drawer"
+          onClick={this.handleDrawerToggle}
+          className={classes.navIcon}
+        >
+          <MenuIcon />
+        </IconButton>
         <SideBar
           files={this.state.files}
+          isOpen={this.state.isDrawerOpen}
           handleAddFiles={this.parseData}
-          handleDelete={this.handleDelete}
-          handleToggle={this.handleToggle}
+          handleDelete={this.handleFileDelete}
+          handleToggle={this.handleFileToggle}
+          handleDrawerToggle={this.handleDrawerToggle}
         />
         <Map files={this.state.files} />
-      </AppFrame>
+      </div>
     );
   }
 }
 
-export default App;
+export default withStyles(styles)(App);
