@@ -2,10 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
+import SwipeableDrawer from '@material-ui/core/SwipeableDrawer';
 import Divider from '@material-ui/core/Divider';
 import FileList from './FilesList';
 import Controls from './Controls';
 import { Hidden } from '@material-ui/core';
+
+const iOS = process.browser && /iPad|iPhone|iPod/.test(navigator.userAgent);
 
 const styles = theme => ({
   modal: {
@@ -50,10 +53,12 @@ const SideBar = ({
       </Drawer>
     </Hidden>
     <Hidden mdUp>
-      <Drawer
+      <SwipeableDrawer
         variant="temporary"
+        disableDiscovery={iOS}
         open={isOpen}
         onClose={handleDrawerToggle}
+        onOpen={handleDrawerToggle}
         classes={{
           modal: classes.modal,
           paper: classes.drawer,
@@ -69,7 +74,7 @@ const SideBar = ({
           handleToggle={handleToggle}
           handleDelete={handleDelete}
         />
-      </Drawer>
+      </SwipeableDrawer>
     </Hidden>
   </React.Fragment>
 );

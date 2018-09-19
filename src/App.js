@@ -5,6 +5,8 @@ import SideBar from './components/SideBar';
 import Map from './components/Map';
 import MenuIcon from '@material-ui/icons/Menu';
 import IconButton from '@material-ui/core/IconButton';
+import colors from './constants';
+import { getColor } from './helpers';
 
 const styles = theme => ({
   appFrame: {
@@ -34,17 +36,8 @@ class App extends Component {
     this.getFromLocalStorage('files');
   };
 
-  getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-
   updateState = (file, name) => {
-    const color = this.getRandomColor();
+    const color = getColor(this.state.files, colors);
     const geoData = file.data.filter(item => Number(item[0])).map(item => ({
       coords: [parseFloat(item[1]), parseFloat(item[0])],
       partner: item[2],
