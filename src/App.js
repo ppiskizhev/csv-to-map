@@ -29,7 +29,6 @@ const styles = theme => ({
 class App extends Component {
   state = {
     files: {},
-    activePlacemarks: [],
     isDrawerOpen: false,
   };
 

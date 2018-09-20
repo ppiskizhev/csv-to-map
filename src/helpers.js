@@ -1,5 +1,3 @@
-import Papa from 'papaparse';
-
 const getRandomColor = () => {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -23,47 +21,6 @@ export const getColor = (files, colors) => {
 
 export const round1Decimal = num => {
   return Math.round(num * 10) / 10;
-};
-
-export const parseData2 = (data, currentState) => {
-  Object.keys(data).forEach(number => {
-    const name = data[number].name.replace('.csv', '');
-
-    if (!currentState.hasOwnProperty(name)) {
-      Papa.parse(data[number], {
-        complete: result => {
-          formatData(result.data);
-        },
-      });
-    }
-  });
-};
-
-const formatData = data => {
-  const willChange = data.map(el => [...el]);
-
-  const fileredData = willChange
-    .filter(item => Number(item[0]))
-    .reduce((filtered, item) => {
-      for (let i = 0; i < filtered.length; i++) {
-        if (filtered[i][2] === item[2]) {
-          filtered[i][7] = round1Decimal(
-            parseFloat(filtered[i][7]) + parseFloat(item[7].replace(/\s/g, ''))
-          );
-          filtered[i][5] = round1Decimal(
-            parseFloat(filtered[i][5]) + parseFloat(item[5])
-          );
-          filtered[i][8] += `, ${item[8]}`;
-          return filtered;
-        }
-      }
-
-      filtered.push(item);
-      return filtered;
-    }, []);
-
-  console.log('до фильтрации', data);
-  console.log('после фильтрации', fileredData);
 };
 
 export const createPlacemark = (data, color) => ({
