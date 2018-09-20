@@ -55,6 +55,7 @@ const SideBar = ({
     <Hidden mdUp>
       <SwipeableDrawer
         variant="temporary"
+        disableBackdropTransition={!iOS}
         disableDiscovery={iOS}
         open={isOpen}
         onClose={handleDrawerToggle}
