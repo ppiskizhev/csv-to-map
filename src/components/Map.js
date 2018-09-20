@@ -1,6 +1,7 @@
 import React from 'react';
 import { YMaps, Map, ObjectManager } from 'react-yandex-maps';
 import styled from 'styled-components';
+import { createPlacemark, copyFields } from '../helpers';
 
 const MapContainer = styled.div`
   flex-grow: 1;
@@ -24,48 +25,24 @@ const MyMap = ({ files }) => {
         .reduce((filtered, item) => {
           for (let i = 0; i < filtered.length; i++) {
             if (filtered[i].partner === item.partner) {
-              filtered[i].sum =
-                Math.round((filtered[i].sum + item.sum) * 10) / 10;
-              filtered[i].weight =
-                Math.round((filtered[i].weight + item.weight) * 10) / 10;
-              filtered[i].task += `, ${item.task}`;
+              filtered[i] = copyFields({ ...filtered[i] }, { ...item });
               return filtered;
             }
           }
 
-          filtered.push(item);
+          filtered.push({ ...item });
           return filtered;
         }, [])
         .forEach(data => {
-          features.push({
-            type: 'Feature',
-            geometry: { type: 'Point', coordinates: data.coords },
-            options: {
-              preset: 'islands#redIcon',
-              iconColor: currentFile.color,
-            },
-            properties: {
-              balloonContent: [
-                `<b>Контрагент: ${data.partner}</b>`,
-                '<br />',
-                `Адрес: ${data.address}`,
-                '<br />',
-                `Сумма: ${data.sum}`,
-                '<br />',
-                `Вес: ${data.weight}`,
-                '<br />',
-                `Задания: ${data.task}`,
-              ].join(''),
-              clusterCaption: `${data.partner}`,
-              hintContent: `${data.partner}`,
-              myDescription: 'Произвольное описание',
-            },
-          });
+          features.push(createPlacemark(data, currentFile.color));
         });
     }
   });
 
-  features.forEach((item, index) => (item.id = index));
+  const indexedFeatures = features.map((item, index) => {
+    item.id = index;
+    return item;
+  });
 
   return (
     <MapContainer>
@@ -79,7 +56,7 @@ const MyMap = ({ files }) => {
             clusters={{
               clusterIconLayout: 'default#pieChart',
             }}
-            features={features}
+            features={indexedFeatures}
           />
         </Map>
       </YMaps>

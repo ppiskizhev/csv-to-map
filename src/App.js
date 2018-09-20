@@ -6,7 +6,7 @@ import Map from './components/Map';
 import MenuIcon from '@material-ui/icons/Menu';
 import IconButton from '@material-ui/core/IconButton';
 import colors from './constants';
-import { getColor } from './helpers';
+import { getColor, round1Decimal } from './helpers';
 
 const styles = theme => ({
   appFrame: {
@@ -29,6 +29,7 @@ const styles = theme => ({
 class App extends Component {
   state = {
     files: {},
+    activePlacemarks: [],
     isDrawerOpen: false,
   };
 
@@ -42,8 +43,8 @@ class App extends Component {
       coords: [parseFloat(item[1]), parseFloat(item[0])],
       partner: item[2],
       address: item[4],
-      weight: Math.round(parseFloat(item[5]) * 10) / 10,
-      sum: Math.round(parseFloat(item[7].replace(/\s/g, '')) * 10) / 10,
+      weight: round1Decimal(parseFloat(item[5])),
+      sum: round1Decimal(parseFloat(item[7].replace(/\s/g, ''))),
       task: item[8],
     }));
 
