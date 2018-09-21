@@ -62,6 +62,8 @@ class App extends Component {
       files: updatedFiles,
     });
 
+    // console.log(this.state.files);
+
     localStorage.setItem('files', JSON.stringify(updatedFiles));
   };
 
@@ -81,9 +83,14 @@ class App extends Component {
 
   handleFileToggle = name => {
     const files = { ...this.state.files };
-    files[name].isActive = !files[name].isActive;
-    this.setState({ files });
-    localStorage.setItem('files', JSON.stringify(files));
+    const isActive = !files[name].isActive;
+    this.setState({
+      files: {
+        ...this.state.files,
+        [name]: { ...this.state.files[name], isActive },
+      },
+    });
+    localStorage.setItem('files', JSON.stringify(this.state.files));
   };
 
   handleFileDelete = name => {

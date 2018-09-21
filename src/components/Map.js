@@ -39,11 +39,6 @@ const MyMap = ({ files }) => {
     }
   });
 
-  const indexedFeatures = features.map((item, index) => {
-    item.id = index;
-    return item;
-  });
-
   return (
     <MapContainer>
       <YMaps>
@@ -56,7 +51,7 @@ const MyMap = ({ files }) => {
             clusters={{
               clusterIconLayout: 'default#pieChart',
             }}
-            features={indexedFeatures}
+            features={features}
           />
         </Map>
       </YMaps>

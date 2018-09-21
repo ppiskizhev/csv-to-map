@@ -25,6 +25,7 @@ export const round1Decimal = num => {
 
 export const createPlacemark = (data, color) => ({
   type: 'Feature',
+  id: `${data.sum}${data.weight}${data.task}`,
   geometry: { type: 'Point', coordinates: data.coords },
   options: {
     preset: 'islands#redIcon',
