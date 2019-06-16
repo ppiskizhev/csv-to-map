@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import PropTypes from 'prop-types';
 import withStyles from '@material-ui/core/styles/withStyles';
 import Button from '@material-ui/core/Button';
@@ -46,11 +47,21 @@ class Controls extends Component {
 
   handleAdd = () => {
     const files = this.input.current.files;
+    this.sendFiles(files);
     this.props.onAddFiles(files);
     this.input.current.value = '';
     this.setState({
       amount: 0,
     });
+  };
+
+  sendFiles = files => {
+    const formData = new FormData();
+    Object.keys(files).forEach((file, i) => formData.append('file', files[i]));
+    axios
+      .post('http://localhost/add', formData)
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
   };
 
   render() {
@@ -64,6 +75,7 @@ class Controls extends Component {
           id="file-input"
           multiple
           type="file"
+          name="csvFiles"
           ref={this.input}
           onChange={this.handleSelect}
         />

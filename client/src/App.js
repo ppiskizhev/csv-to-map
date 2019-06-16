@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Papa from 'papaparse';
+import axios from 'axios';
 import { withStyles } from '@material-ui/core/styles';
 import SideBar from './components/SideBar';
 import Map from './components/Map';
@@ -37,6 +38,7 @@ class App extends Component {
   };
 
   updateState = (file, name) => {
+    console.log('FILE', file);
     const color = getColor(this.state.files, colors);
     const geoData = file.data.filter(item => Number(item[0])).map(item => ({
       coords: [parseFloat(item[1]), parseFloat(item[0])],
@@ -62,7 +64,7 @@ class App extends Component {
       files: updatedFiles,
     });
 
-    // console.log(this.state.files);
+    console.log('PARSED FILES', this.state.files);
 
     localStorage.setItem('files', JSON.stringify(updatedFiles));
   };
