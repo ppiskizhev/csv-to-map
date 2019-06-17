@@ -1,5 +1,5 @@
 const multer = require('multer');
-const { convertToJson, formatSales, mergeSalesFile } = require('../utils/utils');
+const { convertToJson, formatSales, getBdData, updateData } = require('../utils/utils');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -12,14 +12,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-
 function add(app) {
   app.post('/add', upload.array('file'), (req, res) => {
     const fileNames = req.files.map(file => file.originalname);
     getResponseData(fileNames).
       then(data => {
         console.log('Ответ успешно сформирован');
-        res.end('ok');
+        res.json(data);
     })
   });
 }
@@ -27,8 +26,10 @@ function add(app) {
 function getResponseData(fileNames) {
   const promises = fileNames.map(name => convertToJson(name));
   return Promise.all(promises)
-    .then(sales => formatSales(sales))
-    .then(sales => mergeSalesFile(sales))
+    .then(sales => getBdData(sales))
+    .then(({ sales, usedColors }) => formatSales(sales, usedColors))
+    .then((newSales) => updateData(newSales))
+    .catch(err => console.log(err))
 }
 
 module.exports = function(app) {

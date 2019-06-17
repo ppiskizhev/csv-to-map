@@ -1,27 +1,32 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 mongoose.connect("mongodb+srv://Peter:G8hsBAtl2eWOk0nv@riviera-cywpe.mongodb.net/csvpointer?retryWrites=true&w=majority");
 
-// Позволим Mongoose использовать глобальную библиотеку промисов
-mongoose.Promise = global.Promise;
-
-var db = mongoose.connection;
-
-const Files = new mongoose.Schema({
-  _id: String,
-}, {
-  collection: 'files',
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('we are connected to DB')
 });
 
-module.exports = {
-  Files: mongoose.model('files', Files),
-};
+const PointSchema = new Schema({
+  coords: [Number],
+  partner: String,
+  address: String,
+  weight: Number,
+  sum: Number,
+  task: String,
+});
 
-//
-// (async () => {
-//
-//        await mongoose.model('files', Files).collection.insertMany(lal);
-//        const data = await mongoose.model('files', Files).find();
-//
-//        console.log('data', data);
-// })();
+const FileSchema = new Schema({
+  name: String,
+  color: String,
+  isActive: Boolean,
+  points: [PointSchema]
+});
+
+const File = mongoose.model('File', FileSchema);
+
+module.exports = {
+  File
+};
 

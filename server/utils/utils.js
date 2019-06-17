@@ -1,9 +1,11 @@
 const fs = require('fs');
 const csv = require('csvtojson');
-const converter = csv({ noheader: true });
+const { File } = require('../mongodb');
 const { standartColors } = require('../constants');
 
+
 function convertToJson(fileName) {
+  const converter = csv({ noheader: true });
   const promise = converter
     .fromFile(`./uploads/${fileName}`)
     .then(strings => {
@@ -14,20 +16,25 @@ function convertToJson(fileName) {
       }
 
       return sale;
-    });
+    })
+    .catch(err => console.log('Ошибка конвертации', err));
 
   return promise;
 }
 
-function formatSales(sales) {
+function formatSales(sales, bdData) {
+  sales.forEach(sale => sale.name = sale.name.replace(/\.csv/, ''))
+  const salesNames = sales.map(sale => sale.name);
+  const availableColors = getAvailibleColors(salesNames, bdData);
+
   const formatedSales = sales.map(({ name, points }) => ({
       name,
-      points: formatPoints(points)
+      points: formatPoints(points),
+      isActive: false,
+      color: getColor(availableColors)
   }));
 
-  const salesObj = {};
-  formatedSales.forEach(sale => salesObj[sale.name] = sale);
-  return salesObj;
+  return formatedSales;
 }
 
 function formatPoints(points) {
@@ -45,99 +52,42 @@ function formatPoints(points) {
   return formatedPoints;
 }
 
-function mergeSalesFile(newSales) {
-  readSalesFromFile()
-    .then(sales => appendColors(sales, newSales))
-    .then(({ sales, newSales }) => mergeSales(sales, newSales))
-    .then(mergedData => writeSalesToFile(mergedData))
-    .catch(err => console.log(err));
-}
-
-function mergeSales(sales, newSales) {
-  return {
-    ...sales,
-    ...newSales
-  }
-}
-
-function appendColors(sales, newSales) {
-  const usedColors = {};
-  Object.keys(sales).forEach(name => {
-    const { color: usedColor } = sales[name];
-    usedColors[usedColor] = true;
-  });
-
-  for (const name in newSales) {
-    setColor(usedColors, newSales[name]);
-    console.log('SALE', newSales[name]);
-  }
-
-  return { sales, newSales };
-}
-
-function setColor(usedColors, sale) {
-  for (let i = 0; i < standartColors.length; i++) {
-    const currentColor = standartColors[i];
-    console.log('COLOR', currentColor);
-    if (!usedColors[currentColor]) {
-      console.log('TESRT');
-      sale['color'] = currentColor;
-      usedColors[currentColor] = true;
-      return;
-    };
-  }
-
-  const randomColor = getRandomColor();
-  usedColors[randomColor] = true;
-  sale['color'] = randomColor;
-}
-
-function readSalesFromFile() {
-  const promise = new Promise((resolve, reject) => {
-    fs.readFile('./data/sales.json', 'utf8', (err, data) => {
+function getBdData(sales) {
+  return new Promise((resolve, reject) => {
+    File.find({}, 'name color', function(err, usedColors) {
       if (err) {
-        return reject(err);
+        reject(err);
       }
 
-      let json = {};
-      try {
-        json = JSON.parse(data);
-      } catch (err) {
-        console.log(err);
-      }
-
-      console.log('Данные успешно прочитаны');
-      resolve(json);
-    });
-  });
-
-  return promise;
+      resolve({ sales, usedColors });
+    })
+  })
 }
 
-function writeSalesToFile(data) {
-  let string = '';
-  try {
-    string = JSON.stringify(data);
-  } catch (err) {
-    console.log(err);
-  }
-
-  const promise = new Promise((resolve, reject) => {
-    fs.writeFile('./data/sales.json', string, 'utf8', (err) => {
-      if (err) {
-        return reject(err);
-      }
-
-      console.log('Данные успешно записаны');
-      resolve(data);
-    });
-  });
-
-  return promise;
-}
 
 function round1Decimal(num) {
   return Math.round(num * 10) / 10;
+}
+
+function getColor(colors) {
+  return colors.length ? colors.pop() : getRandomColor();
+}
+
+function getAvailibleColors(salesNames, bdData) {
+  const colorNameMap = {};
+
+  bdData.forEach(({ name, color }) => colorNameMap[color] = name);
+
+  const availableColors = standartColors.filter(color => {
+    const name = colorNameMap[color];
+    if (name && !salesNames.includes(name)) {
+      return false;
+    }
+
+    return true;
+  });
+
+  return availableColors;
 }
 
 function getRandomColor() {
@@ -147,10 +97,34 @@ function getRandomColor() {
     color += letters[Math.floor(Math.random() * 16)];
   }
   return color;
-};
+}
+
+function updateData(sales) {
+  return new Promise((resolve, reject) => {
+    const namesToDelete = sales.map(({ name }) => name).join('|');
+    const rxp = new RegExp(namesToDelete);
+    console.log('namesToDelete', namesToDelete);
+    File.deleteMany({ name: rxp }, function(err) {
+      if (err) {
+        console.log('Ошибка при удалении');
+        reject(err);
+      }
+
+      File.insertMany(sales, function(err, docs) {
+        if (err) {
+          console.log('Ошибка при добавлении в бд');
+          reject(err);
+        }
+
+        resolve(docs);
+      })
+    })
+  })
+}
 
 module.exports = {
   convertToJson,
   formatSales,
-  mergeSalesFile
+  getBdData,
+  updateData
 };
