@@ -1,5 +1,6 @@
 const multer = require('multer');
 const { convertToJson, formatSales, getBdData, updateData } = require('../utils/utils');
+const { File } = require('../mongodb');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -19,8 +20,21 @@ function add(app) {
       then(data => {
         console.log('Ответ успешно сформирован');
         res.json(data);
-    })
+      })
+      .catch((err) => res.end('error'));
   });
+}
+
+function get(app) {
+  app.get('/get', (req, res) => {
+    File.find({}, (err, docs) => {
+      if (err) {
+        res.end('error');
+      }
+
+      res.json(docs);
+    })
+  })
 }
 
 function getResponseData(fileNames) {
@@ -34,6 +48,7 @@ function getResponseData(fileNames) {
 
 module.exports = function(app) {
   add(app);
+  get(app);
 };
 
 

@@ -82,7 +82,7 @@ const SideBar = ({
 
 SideBar.propTypes = {
   classes: PropTypes.object.isRequired,
-  files: PropTypes.object.isRequired,
+  files: PropTypes.array.isRequired,
   isOpen: PropTypes.bool.isRequired,
   handleAddFiles: PropTypes.func.isRequired,
   handleToggle: PropTypes.func.isRequired,

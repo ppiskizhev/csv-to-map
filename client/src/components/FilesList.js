@@ -21,37 +21,40 @@ const styles = {
 
 const FileList = ({ files, classes, handleToggle, handleDelete }) => (
   <List>
-    {Object.keys(files).map(name => (
-      <ListItem
-        key={name}
-        button
-        disableRipple
-        color={files[name].color}
-        style={{ '--colorR': files[name].color }}
-        onClick={() => handleToggle(name)}
-      >
-        <Checkbox
+    {files.map(sale => {
+      const { name, color, isActive } = sale;
+      return (
+        <ListItem
+          key={name}
+          button
           disableRipple
-          color="default"
-          classes={{
-            root: classes.root,
-            checked: classes.checked,
-          }}
-          checked={files[name].isActive}
-        />
-        <ListItemText>{name}</ListItemText>
-        <ListItemSecondaryAction>
-          <IconButton onClick={() => handleDelete(name)}>
-            <DeleteIcon />
-          </IconButton>
-        </ListItemSecondaryAction>
-      </ListItem>
-    ))}
+          color={color}
+          style={{ '--colorR': color }}
+          onClick={() => handleToggle(name)}
+        >
+          <Checkbox
+            disableRipple
+            color="default"
+            classes={{
+              root: classes.root,
+              checked: classes.checked,
+            }}
+            checked={isActive}
+          />
+          <ListItemText>{name}</ListItemText>
+          <ListItemSecondaryAction>
+            <IconButton onClick={() => handleDelete(name)}>
+              <DeleteIcon />
+            </IconButton>
+          </ListItemSecondaryAction>
+        </ListItem>
+      );
+    })}
   </List>
 );
 
 FileList.propTypes = {
-  files: PropTypes.object.isRequired,
+  files: PropTypes.array.isRequired,
   handleToggle: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
 };

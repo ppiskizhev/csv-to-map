@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
-import Papa from 'papaparse';
-import axios from 'axios';
 import { withStyles } from '@material-ui/core/styles';
 import SideBar from './components/SideBar';
 import Map from './components/Map';
 import MenuIcon from '@material-ui/icons/Menu';
 import IconButton from '@material-ui/core/IconButton';
-import colors from './constants';
-import { getColor, round1Decimal } from './helpers';
+import axios from 'axios';
 
 const styles = theme => ({
   appFrame: {
@@ -29,58 +26,28 @@ const styles = theme => ({
 
 class App extends Component {
   state = {
-    files: {},
+    files: [],
     isDrawerOpen: false,
   };
 
   componentDidMount = () => {
-    this.getFromLocalStorage('files');
+    this.fetchData();
   };
 
-  updateState = (file, name) => {
-    console.log('FILE', file);
-    const color = getColor(this.state.files, colors);
-    const geoData = file.data.filter(item => Number(item[0])).map(item => ({
-      coords: [parseFloat(item[1]), parseFloat(item[0])],
-      partner: item[2],
-      address: item[4],
-      weight: round1Decimal(parseFloat(item[5])),
-      sum: round1Decimal(parseFloat(item[7].replace(/\s/g, ''))),
-      task: item[8],
-    }));
-
-    const newFile = {
-      geoData,
-      color,
-      isActive: false,
-    };
-
-    const updatedFiles = {
-      ...this.state.files,
-      [name]: newFile,
-    };
-
-    this.setState({
-      files: updatedFiles,
-    });
-
-    console.log('PARSED FILES', this.state.files);
-
-    localStorage.setItem('files', JSON.stringify(updatedFiles));
+  fetchData = () => {
+    fetch('http://localhost/get')
+      .then(res => res.json())
+      .then(data => this.setData(data))
+      .catch(err => console.log(err));
   };
 
-  parseData = data => {
-    Object.keys(data).forEach(number => {
-      const name = data[number].name.replace('.csv', '');
-
-      if (!this.state.files.hasOwnProperty(name)) {
-        Papa.parse(data[number], {
-          complete: result => {
-            this.updateState(result, name);
-          },
-        });
-      }
-    });
+  addData = files => {
+    const formData = new FormData();
+    Object.keys(files).forEach((file, i) => formData.append('file', files[i]));
+    axios
+      .post('http://localhost/add', formData)
+      .then(data => this.setData(data))
+      .catch(err => console.log(err));
   };
 
   handleFileToggle = name => {
@@ -102,18 +69,23 @@ class App extends Component {
     localStorage.setItem('files', JSON.stringify(files));
   };
 
-  getFromLocalStorage = key => {
-    let value = localStorage.getItem(key) || {};
-    try {
-      value = JSON.parse(value);
-      this.setState({ [key]: value });
-    } catch (e) {
-      this.setState({ [key]: {} });
-    }
-  };
-
   handleDrawerToggle = () => {
     this.setState(state => ({ isDrawerOpen: !state.isDrawerOpen }));
+  };
+
+  setData = data => {
+    const { files } = this.state;
+    const newNames = data.map(sale => sale.name);
+
+    const newFiles = files
+      .filter(sale => newNames.includes(sale.name))
+      .push(...data);
+
+    this.setState({
+      files: newFiles,
+    });
+
+    console.log(data);
   };
 
   render() {
@@ -132,7 +104,7 @@ class App extends Component {
         <SideBar
           files={this.state.files}
           isOpen={this.state.isDrawerOpen}
-          handleAddFiles={this.parseData}
+          handleAddFiles={this.addData}
           handleDelete={this.handleFileDelete}
           handleToggle={this.handleFileToggle}
           handleDrawerToggle={this.handleDrawerToggle}

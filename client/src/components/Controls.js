@@ -47,21 +47,11 @@ class Controls extends Component {
 
   handleAdd = () => {
     const files = this.input.current.files;
-    this.sendFiles(files);
     this.props.onAddFiles(files);
     this.input.current.value = '';
     this.setState({
       amount: 0,
     });
-  };
-
-  sendFiles = files => {
-    const formData = new FormData();
-    Object.keys(files).forEach((file, i) => formData.append('file', files[i]));
-    axios
-      .post('http://localhost/add', formData)
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
   };
 
   render() {

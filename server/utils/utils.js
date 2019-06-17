@@ -1,4 +1,3 @@
-const fs = require('fs');
 const csv = require('csvtojson');
 const { File } = require('../mongodb');
 const { standartColors } = require('../constants');
