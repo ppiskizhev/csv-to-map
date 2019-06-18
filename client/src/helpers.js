@@ -23,13 +23,13 @@ export const round1Decimal = num => {
   return Math.round(num * 10) / 10;
 };
 
-export const createPlacemark = (data, color) => ({
+export const createPlacemark = data => ({
   type: 'Feature',
-  id: `${data.sum}${data.weight}${data.task}`,
+  id: `${data._id}`,
   geometry: { type: 'Point', coordinates: data.coords },
   options: {
     preset: 'islands#redIcon',
-    iconColor: color,
+    iconColor: data.color,
   },
   properties: {
     balloonContent: [

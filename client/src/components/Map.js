@@ -1,7 +1,7 @@
 import React from 'react';
 import { YMaps, Map, ObjectManager } from 'react-yandex-maps';
 import styled from 'styled-components';
-import { createPlacemark, copyFields } from '../helpers';
+import { createPlacemark } from '../helpers';
 
 const MapContainer = styled.div`
   flex-grow: 1;
@@ -15,29 +15,15 @@ const mapState = {
 };
 
 const MyMap = ({ files }) => {
-  let features = [];
+  const pointsLists = files
+    .filter(({ isActive }) => Boolean(isActive))
+    .map(sale => {
+      const { color, points } = sale;
+      return points.map(point => ({ ...point, color }));
+    });
 
-  Object.keys(files).forEach(name => {
-    const currentFile = files[name];
-
-    if (currentFile.isActive) {
-      currentFile.geoData
-        .reduce((filtered, item) => {
-          for (let i = 0; i < filtered.length; i++) {
-            if (filtered[i].partner === item.partner) {
-              filtered[i] = copyFields({ ...filtered[i] }, { ...item });
-              return filtered;
-            }
-          }
-
-          filtered.push({ ...item });
-          return filtered;
-        }, [])
-        .forEach(data => {
-          features.push(createPlacemark(data, currentFile.color));
-        });
-    }
-  });
+  const flattenPoints = [].concat(...pointsLists);
+  const placemarks = flattenPoints.map(createPlacemark);
 
   return (
     <MapContainer>
@@ -51,7 +37,7 @@ const MyMap = ({ files }) => {
             clusters={{
               clusterIconLayout: 'default#pieChart',
             }}
-            features={features}
+            features={placemarks}
           />
         </Map>
       </YMaps>

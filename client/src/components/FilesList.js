@@ -19,39 +19,41 @@ const styles = {
   checked: {},
 };
 
-const FileList = ({ files, classes, handleToggle, handleDelete }) => (
-  <List>
-    {files.map(sale => {
-      const { name, color, isActive } = sale;
-      return (
-        <ListItem
-          key={name}
-          button
-          disableRipple
-          color={color}
-          style={{ '--colorR': color }}
-          onClick={() => handleToggle(name)}
-        >
-          <Checkbox
+const FileList = ({ files, classes, handleToggle, handleDelete }) => {
+  return (
+    <List>
+      {files.map(sale => {
+        const { name, color, isActive } = sale;
+        return (
+          <ListItem
+            key={name}
+            button
             disableRipple
-            color="default"
-            classes={{
-              root: classes.root,
-              checked: classes.checked,
-            }}
-            checked={isActive}
-          />
-          <ListItemText>{name}</ListItemText>
-          <ListItemSecondaryAction>
-            <IconButton onClick={() => handleDelete(name)}>
-              <DeleteIcon />
-            </IconButton>
-          </ListItemSecondaryAction>
-        </ListItem>
-      );
-    })}
-  </List>
-);
+            color={color}
+            style={{ '--colorR': color }}
+            onClick={() => handleToggle(name)}
+          >
+            <Checkbox
+              disableRipple
+              color="default"
+              classes={{
+                root: classes.root,
+                checked: classes.checked,
+              }}
+              checked={isActive}
+            />
+            <ListItemText>{name}</ListItemText>
+            <ListItemSecondaryAction>
+              <IconButton onClick={() => handleDelete(name)}>
+                <DeleteIcon />
+              </IconButton>
+            </ListItemSecondaryAction>
+          </ListItem>
+        );
+      })}
+    </List>
+  );
+};
 
 FileList.propTypes = {
   files: PropTypes.array.isRequired,

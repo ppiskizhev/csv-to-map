@@ -46,27 +46,43 @@ class App extends Component {
     Object.keys(files).forEach((file, i) => formData.append('file', files[i]));
     axios
       .post('http://localhost/add', formData)
-      .then(data => this.setData(data))
+      .then(({ data }) => this.setData(data))
       .catch(err => console.log(err));
   };
 
   handleFileToggle = name => {
-    const files = { ...this.state.files };
-    const isActive = !files[name].isActive;
-    this.setState({
-      files: {
-        ...this.state.files,
-        [name]: { ...this.state.files[name], isActive },
-      },
+    const { files } = this.state;
+    const updatedFiles = files.map(file => {
+      if (file.name === name) {
+        const isActive = !file.isActive;
+        return { ...file, isActive };
+      }
+
+      return file;
     });
-    localStorage.setItem('files', JSON.stringify(this.state.files));
+
+    this.setState({
+      files: updatedFiles,
+    });
+
+    axios
+      .post('http://localhost/toggle', { name })
+      .then(res => res)
+      .catch(err => console.log(err));
   };
 
   handleFileDelete = name => {
-    const files = { ...this.state.files };
-    delete files[name];
-    this.setState({ files });
-    localStorage.setItem('files', JSON.stringify(files));
+    const { files } = this.state;
+    const updatedFiles = files.filter(file => file.name !== name);
+
+    this.setState({
+      files: updatedFiles,
+    });
+
+    axios
+      .post('http://localhost/remove', { name })
+      .then(res => res)
+      .catch(err => console.log(err));
   };
 
   handleDrawerToggle = () => {
@@ -77,15 +93,13 @@ class App extends Component {
     const { files } = this.state;
     const newNames = data.map(sale => sale.name);
 
-    const newFiles = files
-      .filter(sale => newNames.includes(sale.name))
-      .push(...data);
+    const newFiles = files.filter(sale => !newNames.includes(sale.name));
+
+    newFiles.push(...data);
 
     this.setState({
       files: newFiles,
     });
-
-    console.log(data);
   };
 
   render() {

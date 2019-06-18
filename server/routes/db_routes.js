@@ -1,6 +1,9 @@
 const multer = require('multer');
+const bodyParser = require('body-parser');
 const { convertToJson, formatSales, getBdData, updateData } = require('../utils/utils');
 const { File } = require('../mongodb');
+
+const jsonParser = bodyParser.json();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -37,6 +40,39 @@ function get(app) {
   })
 }
 
+function toggle(app) {
+  app.post('/toggle', jsonParser, (req, res) => {
+    const { name } = req.body;
+    File.findOne({ name }, (err, doc) => {
+      if (err) {
+        res.end('error');
+      }
+
+      doc.isActive = !doc.isActive;
+      doc.save((err) => {
+        if (err) {
+          res.end('error');
+        } else {
+          res.end('ok');
+        }
+      })
+    })
+  });
+}
+
+function remove(app) {
+  app.post('/remove', jsonParser, (req, res) => {
+    const { name } = req.body;
+    File.deleteOne({ name }, function(err) {
+      if (err) {
+        res.end('error');
+      } else {
+        res.end('ok');
+      }
+    })
+  });
+}
+
 function getResponseData(fileNames) {
   const promises = fileNames.map(name => convertToJson(name));
   return Promise.all(promises)
@@ -49,6 +85,8 @@ function getResponseData(fileNames) {
 module.exports = function(app) {
   add(app);
   get(app);
+  toggle(app);
+  remove(app);
 };
 
 
