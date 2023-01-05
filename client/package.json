@@ -11,7 +11,7 @@
     "react": "^16.5.0",
     "react-dom": "^16.5.0",
     "react-redux": "^5.0.7",
-    "react-scripts": "1.1.5",
+    "react-scripts": "5.0.1",
     "react-yandex-maps": "^2.3.0",
     "redux": "^4.0.0",
     "serve": "^10.1.1",
